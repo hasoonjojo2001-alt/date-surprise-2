@@ -19,13 +19,14 @@ color:white;
 text-align:center;
 }
 
-.fade{
-animation:fadeIn 1.5s forwards;
-}
-
-@keyframes fadeIn{
-from{opacity:0;}
-to{opacity:1;}
+body::before{
+content:"";
+background:url('photo.jpg') center/cover no-repeat;
+position:absolute;
+width:100%;
+height:100%;
+filter:blur(8px) brightness(0.5);
+z-index:-1;
 }
 
 .card{
@@ -35,6 +36,7 @@ padding:40px;
 border-radius:20px;
 box-shadow:0 10px 40px rgba(0,0,0,0.4);
 width:360px;
+animation:fadeIn 1.5s forwards;
 }
 
 button{
@@ -58,21 +60,16 @@ border:none;
 cursor:pointer;
 }
 
-body::before{
-content:"";
-background:url('photo.jpg') center/cover no-repeat;
-position:absolute;
-width:100%;
-height:100%;
-filter:blur(8px) brightness(0.5);
-z-index:-1;
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
 }
 </style>
 </head>
 
 <body>
 
-<div id="loading"></div>
+<div id="app"></div>
 
 <audio id="bgMusic">
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3" type="audio/mpeg">
@@ -80,11 +77,11 @@ z-index:-1;
 
 <script>
 
-// -------- FAKE SCAN ----------
-const loading = document.getElementById("loading");
+const app = document.getElementById("app");
 
+// -------- FAKE SCAN ----------
 let percent = 0;
-loading.innerHTML = "<h2>Scanning compatibility...</h2><h1 id='percent'>0%</h1>";
+app.innerHTML = "<h2>Scanning compatibility...</h2><h1 id='percent'>0%</h1>";
 
 let interval = setInterval(()=>{
 percent += Math.floor(Math.random()*10)+5;
@@ -98,10 +95,10 @@ document.getElementById("percent").innerText = percent + "%";
 }
 }, 300);
 
-// -------- MAIN PAGE ----------
+// -------- MAIN ----------
 function showMain(){
-document.body.innerHTML = `
-<div class="card fade">
+app.innerHTML = `
+<div class="card">
 <h2>Will you be my date tomorrow? ❤️</h2>
 <button onclick="accept()">Yes 💘</button>
 </div>
@@ -113,8 +110,8 @@ function accept(){
 document.getElementById("bgMusic").play();
 confetti({particleCount:200,spread:120});
 
-document.body.innerHTML = `
-<div class="fade" style="font-size:22px;">
+app.innerHTML = `
+<div class="card">
 <h2>4:00 PM ⏰</h2>
 <p>Dress code: like always… effortlessly beautiful.</p>
 <br>
@@ -142,13 +139,14 @@ typing();
 // -------- SECRET ----------
 function secret(){
 confetti({particleCount:300,spread:150});
-document.body.innerHTML = `
-<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-size:26px;text-align:center;padding:20px;">
-Too late.<br><br>
-I'm already counting the minutes until 4 ❤️
+app.innerHTML = `
+<div class="card">
+<h2>Too late 😌</h2>
+<p>I'm already counting the minutes until 4 ❤️</p>
 </div>
 `;
 }
+
 </script>
 
 </body>
