@@ -14,20 +14,18 @@ justify-content:center;
 align-items:center;
 font-family:Arial;
 overflow:hidden;
-text-align:center;
+background:black;
 color:white;
-position:relative;
+text-align:center;
 }
 
-/* خلفية صورتكم Blur */
-body::before{
-content:"";
-background:url('photo.jpg') center/cover no-repeat;
-position:absolute;
-width:100%;
-height:100%;
-filter:blur(8px) brightness(0.6);
-z-index:-1;
+.fade{
+animation:fadeIn 1.5s forwards;
+}
+
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
 }
 
 .card{
@@ -35,9 +33,8 @@ background:white;
 color:black;
 padding:40px;
 border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
+box-shadow:0 10px 40px rgba(0,0,0,0.4);
 width:360px;
-position:relative;
 }
 
 button{
@@ -47,96 +44,90 @@ border-radius:20px;
 font-size:16px;
 cursor:pointer;
 margin:10px;
-transition:0.3s;
 }
 
-.yes{
-background:#ff4d6d;
-color:white;
-}
-
-.no{
-background:#ccc;
+.hiddenBtn{
 position:absolute;
+bottom:20px;
+right:20px;
+font-size:10px;
+opacity:0.4;
+background:none;
+color:white;
+border:none;
+cursor:pointer;
 }
 
-.countdown{
-font-size:18px;
-margin-top:15px;
-color:#ff4d6d;
-}
-
-/* نبض */
-@keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.15);}
-100%{transform:scale(1);}
-}
-.yes:active{
-animation:pulse 0.4s;
+body::before{
+content:"";
+background:url('photo.jpg') center/cover no-repeat;
+position:absolute;
+width:100%;
+height:100%;
+filter:blur(8px) brightness(0.5);
+z-index:-1;
 }
 </style>
 </head>
 
 <body>
 
-<div class="card" id="mainCard">
-<h2>Will you be my date tomorrow? ❤️</h2>
-<button class="yes" onclick="stepTwo()">Yes 💘</button>
-<button class="no" id="noBtn">No 😅</button>
-</div>
+<div id="loading"></div>
 
 <audio id="bgMusic">
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-const noBtn=document.getElementById("noBtn");
 
-noBtn.addEventListener("mouseover",function(){
-const x=Math.random()*250;
-const y=Math.random()*200;
-noBtn.style.left=x+"px";
-noBtn.style.top=y+"px";
-noBtn.innerText="Nice try 😏";
-});
+// -------- FAKE SCAN ----------
+const loading = document.getElementById("loading");
 
-function stepTwo(){
+let percent = 0;
+loading.innerHTML = "<h2>Scanning compatibility...</h2><h1 id='percent'>0%</h1>";
+
+let interval = setInterval(()=>{
+percent += Math.floor(Math.random()*10)+5;
+if(percent >= 100){
+percent = 100;
+clearInterval(interval);
+document.getElementById("percent").innerText = "100%";
+setTimeout(showMain, 1000);
+}else{
+document.getElementById("percent").innerText = percent + "%";
+}
+}, 300);
+
+// -------- MAIN PAGE ----------
+function showMain(){
+document.body.innerHTML = `
+<div class="card fade">
+<h2>Will you be my date tomorrow? ❤️</h2>
+<button onclick="accept()">Yes 💘</button>
+</div>
+`;
+}
+
+// -------- ACCEPT ----------
+function accept(){
 document.getElementById("bgMusic").play();
-confetti({particleCount:150,spread:100});
+confetti({particleCount:200,spread:120});
 
-document.getElementById("mainCard").innerHTML=`
-<h2>Tomorrow at 4 PM ⏰</h2>
-<p>Dress code: as usual… because you're beautiful in every case ❤️</p>
-<div class="countdown" id="timer"></div>
+document.body.innerHTML = `
+<div class="fade" style="font-size:22px;">
+<h2>4:00 PM ⏰</h2>
+<p>Dress code: like always… effortlessly beautiful.</p>
 <br>
-<button onclick="finalStep()">Continue</button>
+<p id="finalText"></p>
+<button class="hiddenBtn" onclick="secret()">Don't click this</button>
+</div>
 `;
 
-startCountdown();
+typeWriter("I miss you. More than I admit. More than you know.", "finalText", 60);
 }
 
-/* عد تنازلي */
-function startCountdown(){
-const target=new Date();
-target.setHours(16,0,0,0);
-
-setInterval(()=>{
-const now=new Date();
-const diff=target-now;
-
-if(diff>0){
-const hours=Math.floor(diff/1000/60/60);
-const minutes=Math.floor(diff/1000/60)%60;
-const seconds=Math.floor(diff/1000)%60;
-document.getElementById("timer").innerHTML=
-"Countdown: "+hours+"h "+minutes+"m "+seconds+"s";
-}
-},1000);
-}
-
-/* آلة كاتبة */
-function typeWriter(text, elementId, speed=50){
+// -------- TYPEWRITER ----------
+function typeWriter(text, elementId, speed){
 let i=0;
 function typing(){
 if(i<text.length){
@@ -148,29 +139,13 @@ setTimeout(typing,speed);
 typing();
 }
 
-function finalStep(){
-confetti({particleCount:200,spread:120});
-
-const startDate=new Date("2018-03-08"); // غير التاريخ
-const today=new Date();
-const diffDays=Math.floor((today-startDate)/(1000*60*60*24));
-
-document.getElementById("mainCard").innerHTML=`
-<h2 id="finalText"></h2>
-<p>We've survived ${diffDays} days together… and I’d still choose you again.</p>
-<br>
-<button onclick="lastScene()">Come here</button>
-`;
-
-typeWriter("I miss you 🤍", "finalText", 70);
-}
-
-function lastScene(){
+// -------- SECRET ----------
+function secret(){
 confetti({particleCount:300,spread:150});
-document.body.innerHTML=`
-<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;font-size:28px;text-align:center;padding:20px;">
-You’re mine at 4 PM.<br><br>
-And honestly… I’d pick you in every lifetime. ❤️
+document.body.innerHTML = `
+<div style="display:flex;justify-content:center;align-items:center;height:100vh;font-size:26px;text-align:center;padding:20px;">
+Too late.<br><br>
+I'm already counting the minutes until 4 ❤️
 </div>
 `;
 }
